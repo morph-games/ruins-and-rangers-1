@@ -1,0 +1,31 @@
+{
+  "name": "1dim-roguelike",
+  "version": "0.1.0",
+  "description": "Traditional Roguelike game, but in 1-dimension",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "vite dev",
+    "preview": "vite preview",
+    "build": "vite build",
+    "build:local": "vite build --base=./"
+  },
+  "keywords": [
+    "7DRL",
+    "Roguelike",
+    "Traditional",
+    "Roguelike"
+  ],
+  "author": "Luke Nickerson",
+  "license": "MIT",
+  "devDependencies": {
+    "rocket-boots-eslint": "github:rocket-boots/rocket-boots-eslint",
+    "roguelike-fonts": "github:rocket-boots/roguelike-fonts",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "rocket-utility-belt": "github:rocket-boots/rocket-utility-belt#v0.3.2",
+    "vue": "^3.5.13"
+  }
+}
