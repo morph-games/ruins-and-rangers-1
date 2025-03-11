@@ -3,7 +3,10 @@
 
 ## Play Now
 
-On itch: https://deathray.itch.io/ruins-and-rangers-7drl
+* Latest release on itch: https://deathray.itch.io/ruins-and-rangers-7drl
+* Latest code here: https://morph-games.github.io/ruins-and-rangers-1/dist/
+* The 7DRL 1.0.0 version: https://morph-games.github.io/ruins-and-rangers-1/7DRL-2025/
+
 
 ## Run Locally
 
