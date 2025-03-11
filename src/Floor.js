@@ -319,8 +319,8 @@ export default class Floor {
 		const [
 			total, , deflecting,
 		] = defender.applyDamage(attackDamage);
-		attacker.combatCooldown += 1;
-		defender.combatCooldown += 1;
+		attacker.putInCombat();
+		defender.putInCombat();
 		let msg = (total) ? `${attacker.name} hits ${defender.name} for ${total} damage.`
 			: `${attacker.name} misses ${defender.name}.`;
 		if (deflecting) msg += ' (deflected)';

@@ -211,7 +211,7 @@ export default class Actor extends Entity {
 			newDamage[dmgKey] = newDmgArray;
 			strengthenAmounts[dmgKey] = dmgStr;
 		});
-		console.log(newDamage, strengthenAmounts);
+		// console.log(newDamage, strengthenAmounts);
 		return newDamage;
 	}
 
@@ -260,6 +260,7 @@ export default class Actor extends Entity {
 		const item = this.getItem(itemId);
 		if (!item) return 'No item';
 		if (!item.eat) return 'Not edible.';
+		if (item.equipped) return 'Cannot eat equipped items';
 		let msg = `Ate the ${item.name}, and `;
 		if (item.eat.heal) {
 			const [amount] = this.applyHealing(item.eat.heal);
@@ -291,9 +292,13 @@ export default class Actor extends Entity {
 		}
 	}
 
+	putInCombat() {
+		this.combatCooldown = 1;
+	}
+
 	advanceTurn() {
 		// TODO: things like bleeding, aging, cooldowns, etc.
-		if (this.combatCooldown > 0) this.combatCooldown = clamp(this.combatCooldown - 2, 0, 10);
 		this.naturalHeal();
+		if (this.combatCooldown > 0) this.combatCooldown = clamp(this.combatCooldown - 1, 0, 1);
 	}
 }

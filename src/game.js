@@ -146,7 +146,7 @@ const appOptions = {
 			this.isPcAlive = world.pc.alive;
 			const range = Math.abs(world.pc.x);
 			if (range > this.highestRange) this.highestRange = range;
-			console.log(this.spaces);
+			console.log([...this.spaces]);
 		},
 		getImageSource(spriteName) {
 			return scroll.getDataUri(spriteName);
@@ -298,6 +298,7 @@ const appOptions = {
 		toggleInventory() {
 			this.showInventory = !this.showInventory;
 			this.loadInventory();
+			if (!this.showInventory) this.focusWorld();
 		},
 		getInventoryClasses() {
 			return {
@@ -338,7 +339,7 @@ const appOptions = {
 		<div class="top-bar" :class="showTitle ? 'title' : ''">
 			<div>
 				Ruins &amp; Rangers 7DRL
-				<span class="version">v1.0.0</span>
+				<span class="version">v1.0.1</span>
 			</div>
 			<div class="sub-title">
 				A One-Dimensional Traditional Roguelike
@@ -426,7 +427,7 @@ const appOptions = {
 						@click="clickInventoryItem(item)">
 						<img :src="getImageSource(item?.spriteName)" class="inventory-item-image" />
 						<div class="inventory-tooltip">
-							{{item.adjective}} {{item.name}}
+							{{item?.adjective}} {{item?.name || '??'}}
 						</div>
 						<!--  {{item.name}} -->
 						<!-- {{JSON.stringify(item)}} -->
@@ -434,7 +435,7 @@ const appOptions = {
 				</ol>
 				<div class="inventory-info" v-if="selectedInventoryItem">
 					<div class="inventory-title">
-						{{selectedInventoryItem.adjective}} {{selectedInventoryItem.name}}
+						{{selectedInventoryItem?.adjective}} {{selectedInventoryItem?.name || '??'}}
 					</div>
 					<div v-if="selectedInventoryItem?.equipped" class="inventory-info-equipped">
 						Equipped

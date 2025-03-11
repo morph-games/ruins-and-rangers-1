@@ -32,8 +32,14 @@ img {
 	image-rendering: pixelated;
 }
 
+#app {
+	height: 100vh;
+	width: 100vw;
+	text-align: center;
+}
 #game {
 	display: flex;
+	text-align: left;
 	height: 100vh;
 	width: 100vw;
 	flex-direction: column;
@@ -161,7 +167,7 @@ img {
 	flex-grow: 2;
 	display: flex;
 	flex-direction: column;
-	max-height: 45vh;
+	max-height: 70vh;
 }
 .space-controls {
 	flex-grow: 1;
@@ -266,7 +272,6 @@ button:hover {
 	height: var(--inv-height);
 	bottom: 4em;
 	width: auto;
-	max-width: 95vw;
 	height: auto;
 	max-height: 90vh;
 	transform: scale(1);
@@ -311,6 +316,7 @@ input:checked ~ label:hover {
 	align-items: flex-start;
 	flex-wrap: wrap;
 	align-content: flex-start;
+	overflow: auto;
 }
 .inventory-item-image {
 	width: var(--map-square);
