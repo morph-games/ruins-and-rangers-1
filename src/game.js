@@ -339,7 +339,7 @@ const appOptions = {
 		<div class="top-bar" :class="showTitle ? 'title' : ''">
 			<div>
 				Ruins &amp; Rangers 7DRL
-				<span class="version">v1.0.1</span>
+				<span class="version">v1.0.2</span>
 			</div>
 			<div class="sub-title">
 				A One-Dimensional Traditional Roguelike
