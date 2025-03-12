@@ -5,6 +5,7 @@ const foodAdjectives = [
 ];
 const metalAdjectives = ['worn', 'rusty', 'polished', 'engraved', 'dented', 'bent'];
 const magicalAdjectives = ['magic', 'mystical', 'glowing', 'engraved'];
+const holyAdjectives = ['mystical', 'blessed', 'engraved'];
 const armorAdjectives = ['worn', 'ugly', 'tattered', 'scuffed'];
 
 export default addKeyFreeze({
@@ -141,6 +142,26 @@ export default addKeyFreeze({
 		attack: { damage: { physical: [5, 8] } },
 	},
 
+	// ----- Holy
+	holyHammer: {
+		name: 'holy hammer',
+		adjectives: [...holyAdjectives],
+		equip: 'hand',
+		tags: ['weapon', 'gear', 'metal', 'blunt', 'holy'],
+		sprites: [['hammer', 1]],
+		attack: { damage: { physical: [3, 5], holy: [3, 7] } },
+		equipBoost: { maxFaith: 10 },
+	},
+	deathStaff: {
+		name: 'staff of death',
+		adjectives: [...holyAdjectives],
+		equip: 'hand',
+		tags: ['weapon', 'gear', 'evil', 'holy'],
+		sprites: [['skull-staff', 1]],
+		attack: { damage: { holy: [4, 10] } },
+		equipBoost: { maxFaith: 10 },
+	},
+
 	// ----- Magick
 	staff: {
 		name: 'staff',
@@ -152,7 +173,7 @@ export default addKeyFreeze({
 		equipBoost: { maxMana: 10 },
 	},
 	wand: {
-		name: 'staff of death',
+		name: 'staff of chaos',
 		adjectives: [...magicalAdjectives],
 		equip: 'hand',
 		tags: ['weapon', 'gear', 'evil', 'magic'],

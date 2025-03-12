@@ -3,6 +3,7 @@ import Floor from './Floor.js';
 import Actor from './Actor.js';
 
 const starterRegion = {
+	name: 'Home Village',
 	grounds: ['grass', 'mud'],
 	props: ['house', 'shop', 'tower', 'cart'],
 	itemTags: ['food', 'gear', 'weapon'],
@@ -26,6 +27,10 @@ export default class World {
 		this.pc.intelligence = 0;
 		this.activeFloor.addMob(this.pc);
 		this.highestRange = 0;
+	}
+
+	getRegion(x = this.pc?.x || 0) {
+		return this.activeFloor.getRegion(x);
 	}
 
 	setWorldSeed(seed) {
@@ -67,11 +72,23 @@ export default class World {
 	}
 
 	eat(itemId) {
+		// TODO: Move this to a planned action and advance round
+		// ...once it is possible to send the text feedback back to the inventory UI
 		return this.pc.eat(itemId);
 	}
 
 	pickUp(dx) {
 		this.activeFloor.planAction(PC_ID, 'pickUp', dx);
+		this.advanceRound();
+	}
+
+	deconstruct(itemId) {
+		this.activeFloor.planAction(PC_ID, 'deconstruct', 0, { itemId });
+		this.advanceRound();
+	}
+
+	drop(itemId, dx = 0) {
+		this.activeFloor.planAction(PC_ID, 'drop', dx, { itemId });
 		this.advanceRound();
 	}
 

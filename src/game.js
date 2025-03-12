@@ -62,6 +62,7 @@ const appOptions = {
 	data() {
 		return {
 			showTitle: true, // toggle for testing
+			range: 0,
 			highestRange: 0,
 			isPcAlive: true,
 			selectedSpaceIndex: null,
@@ -96,6 +97,8 @@ const appOptions = {
 				{ verb: 'equip', display: 'Equip' },
 				{ verb: 'eat', display: 'Eat' },
 				// { verb: 'toss', display: 'Throw' },
+				{ verb: 'drop', display: 'Drop' },
+				{ verb: 'deconstruct', display: 'Deconstruct' },
 			],
 			selectedInventoryItem: null,
 			extraBubbles: [],
@@ -144,9 +147,10 @@ const appOptions = {
 		loadSpaces() {
 			this.spaces = world.getSpaces(this.worldX, this.spacesSize);
 			this.isPcAlive = world.pc.alive;
-			const range = Math.abs(world.pc.x);
-			if (range > this.highestRange) this.highestRange = range;
-			console.log([...this.spaces]);
+			this.range = Math.abs(world.pc.x);
+			if (this.range > this.highestRange) this.highestRange = this.range;
+			this.regionName = world.getRegion()?.name || '';
+			// console.log([...this.spaces]);
 		},
 		getImageSource(spriteName) {
 			return scroll.getDataUri(spriteName);
@@ -321,6 +325,10 @@ const appOptions = {
 					this.inventoryMessage = world.equip(item.itemId, true);
 				} else if (this.selectedInventoryAction === 'eat') {
 					this.inventoryMessage = world.eat(item.itemId);
+				} else if (this.selectedInventoryAction === 'drop') {
+					this.inventoryMessage = world.drop(item.itemId, this.facing);
+				} else if (this.selectedInventoryAction === 'deconstruct') {
+					this.inventoryMessage = world.deconstruct(item.itemId);
 				}
 				this.loadInventory();
 				this.selectedInventoryItem = this.inventory.find((it) => it.itemId === item.itemId);
@@ -338,12 +346,18 @@ const appOptions = {
 	<div id="game" @click="clickGame" @keydown="handleKeyDown" tabindex="0">
 		<div class="top-bar" :class="showTitle ? 'title' : ''">
 			<div>
-				Ruins &amp; Rangers 7DRL
-				<span class="version">v1.0.2</span>
+				Ruins &amp; Rangers
+				<span class="version">v1.1.0</span>
 			</div>
-			<div class="sub-title">
+			<div class="sub-title" v-if="showTitle">
 				A One-Dimensional Traditional Roguelike
 				<!-- Adventure Along the Arcane Axis -->
+			</div>
+			<div class="region" v-if="!showTitle">
+				{{regionName}}
+			</div>
+			<div class="range" v-if="!showTitle">
+				Range: {{range}} 
 			</div>
 			<div class="scores" v-if="!showTitle">
 				Score: {{highestRange}}
@@ -410,7 +424,8 @@ const appOptions = {
 						<input type="radio" name="inv-action"
 							v-model="selectedInventoryAction"
 							:id="action.verb" :value="action.verb" />
-						<label :for="action.verb">
+						<label :for="action.verb"
+							:class="action.display.length > 8 ? 'inv-action-long' : ''">
 							{{action.display}}
 						</label>
 					</li>
@@ -420,7 +435,7 @@ const appOptions = {
 						{{inventoryMessage}}
 					</div>
 					<div v-if="!inventory.length">
-						Empty
+						Inventory is Empty
 					</div>
 					<li v-for="item in inventory"
 						:class="getInventoryItemClasses(item)"
@@ -450,7 +465,7 @@ const appOptions = {
 					<div v-if="selectedInventoryItem?.attack?.damage">
 						Melee damage:
 						<span v-for="(dmgArr, dmgType) in selectedInventoryItem?.attack?.damage">
-							{{dmgArr.join('-')}} {{dmgType}}
+							{{dmgArr.join('-')}} {{dmgType}} 
 						</span>
 					</div>
 					<div v-if="selectedInventoryItem?.equipBoost">

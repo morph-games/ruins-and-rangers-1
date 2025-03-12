@@ -19,11 +19,29 @@ export default addKeyFreeze({
 		sprites: [
 			['plain-m', 1],
 			['plain-f', 1],
+			['plain-m', 1],
+			['plain-f', 1],
+			['boy', 1],
+			['girl', 1],
+			['fat-f', 1],
+			['fat-f', 1],
 		],
 		hp: 10,
 		faction: 'humans',
 		deflection: 0,
 		faith: 10,
+	},
+	pet: {
+		name: 'pet',
+		aggro: 0,
+		sprites: [
+			['cat', 1],
+			['dog', 1],
+		],
+		hp: 4,
+		faction: 'humans',
+		deflection: 0,
+		stamina: 30,
 	},
 	goblin: {
 		name: 'goblin',
@@ -34,6 +52,41 @@ export default addKeyFreeze({
 		],
 		hp: 8,
 		faction: 'trollkin',
+	},
+	slime: {
+		name: 'slime',
+		aggro: 1,
+		char: 'u',
+		sprites: [
+			['slime', 1],
+		],
+		hp: 8,
+		faction: 'swamp',
+		naturalDamage: { physical: [1, 2] },
+		deflection: 30,
+	},
+	snake: {
+		name: 'snake',
+		aggro: 0,
+		char: 's',
+		sprites: [
+			['snake', 1],
+		],
+		hp: 6,
+		faction: 'snakes',
+		naturalDamage: { physical: [1, 4] },
+	},
+	bear: {
+		name: 'bear',
+		aggro: 0,
+		char: 'b',
+		sprites: [
+			['bear', 1],
+		],
+		hp: 14,
+		faction: 'bears',
+		naturalDamage: { physical: [2, 5] },
+		deflection: 30,
 	},
 	orc: {
 		name: 'orc',
@@ -56,7 +109,7 @@ export default addKeyFreeze({
 		hp: 15,
 		faction: 'trollkin',
 		naturalDamage: { physical: [3, 7] },
-		deflection: 20,
+		deflection: 30,
 	},
 	troll: {
 		name: 'troll',
@@ -68,7 +121,18 @@ export default addKeyFreeze({
 		hp: 20,
 		faction: 'trollkin',
 		naturalDamage: { physical: [3, 8] },
-		deflection: 30,
+		deflection: 40,
+	},
+	zombie: {
+		aggro: 1,
+		name: 'zombie',
+		char: 'z',
+		sprites: [
+			['zombie', 1],
+		],
+		hp: 8,
+		faction: 'unliving',
+		naturalDamage: { physical: [2, 4] },
 	},
 	skeleton: {
 		aggro: 1,
@@ -91,6 +155,6 @@ export default addKeyFreeze({
 		hp: 15,
 		faction: 'unliving',
 		naturalDamage: { physical: [4, 6] },
-		deflection: 30,
+		deflection: 40,
 	},
 });

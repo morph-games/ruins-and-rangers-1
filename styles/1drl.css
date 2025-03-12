@@ -16,7 +16,7 @@
 
 
 html {
-	font-size: calc(1vmin + 14px);
+	font-size: calc(1vmin + 12px);
 }
 body {
 	font-family: 'White Rabbit', monospace;
@@ -291,6 +291,9 @@ button:hover {
 	cursor: pointer;
 	border-radius: 0.2em;
 	color: #fff;
+}
+.inv-action-long {
+	font-size: 80%;
 }
 .inventory-actions label:hover {
 	background: #fff3;

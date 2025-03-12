@@ -270,6 +270,12 @@ export default class Floor {
 
 	addItem(item = {}) {
 		const itemId = item.itemId || Math.random();
+		const existingItem = this.items.get(itemId);
+		if (existingItem) {
+			console.warn('Overwriting item', item);
+			// this.items.set(itemId, { ...existingItem, ...item });
+			// return;
+		}
 		this.items.set(itemId, item);
 	}
 
@@ -299,11 +305,27 @@ export default class Floor {
 	}
 
 	pickUp(actor, dx) {
-		const x = actor.x + dx; // TODO: check range actor.x vs x
+		const x = actor.x + dx;
+		const pickUpRange = 1; // TODO: get this from the actor?
+		if (Math.abs(dx) > pickUpRange) return 'Too far to pick up.';
 		const items = this.findItemsAtX(x).filter((item) => !item.removed);
 		const item = items.pop();
+		if (!item) return 'No item found';
 		actor.addItem(item);
 		this.removeItem(item.itemId);
+		return `Picked up ${item.name || '??'}`;
+	}
+
+	drop(actor, itemId, dx = 0) {
+		const x = actor.x + dx;
+		const item = actor.dropItem(itemId);
+		if (!item) return 'No item to drop.';
+		item.x = x;
+		this.addItem(item);
+		let where = '';
+		if (dx < 0) where = 'to the left';
+		if (dx > 0) where = 'to the right';
+		return `Dropped ${item.name} ${where}.`;
 	}
 
 	meleeAttack(actorId, x) {
@@ -329,13 +351,17 @@ export default class Floor {
 
 	doNextAction(mob) {
 		if (!mob.nextAction || !mob.alive) return;
-		const { verb, x, dx } = mob.nextAction;
+		const { verb, x, dx, itemId } = mob.nextAction;
 		if (verb === 'attack') {
 			this.meleeAttack(mob.actorId, x);
 		} else if (verb === 'move') {
 			this.moveActor(mob.actorId, dx);
 		} else if (verb === 'pickUp') {
 			this.pickUp(mob, dx);
+		} else if (verb === 'drop') {
+			this.drop(mob, itemId, dx);
+		} else if (verb === 'deconstruct') {
+			mob.deconstruct(itemId);
 		} else {
 			console.warn('Unknown action', verb);
 		}
@@ -352,9 +378,9 @@ export default class Floor {
 		actor.nextAction = { verb: 'move', dx };
 	}
 
-	planAction(actorId, verb, dx) {
+	planAction(actorId, verb, dx, actionProps = {}) {
 		const actor = this.mobs.get(actorId);
-		actor.nextAction = { verb, dx };
+		actor.nextAction = { ...actionProps, verb, dx };
 	}
 
 	mobPlanning(mob) {

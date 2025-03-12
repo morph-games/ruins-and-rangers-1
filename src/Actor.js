@@ -109,7 +109,8 @@ export default class Actor extends Entity {
 		return !this.equipSlots[slotKey];
 	}
 
-	getItem(itemId) {
+	getItem(itemOrId) {
+		const itemId = (typeof itemOrId === 'object') ? itemOrId.itemId : itemOrId;
 		return this.inventory.find((it) => it.itemId === itemId);
 	}
 
@@ -155,6 +156,16 @@ export default class Actor extends Entity {
 		return [true, `Unequipped ${item.name || item.key}`];
 	}
 
+	cleanInventory() {
+		const emptySpots = [];
+		this.inventory.forEach((item, index) => { if (!item) emptySpots.push(index); });
+		if (emptySpots.length) console.warn('Found empty spaces in inventory', JSON.stringify(this.inventory));
+		// Loop through backwards to remove the blanks at the indices
+		for (let i = this.inventory.length - 1; i >= 0; i -= 1) {
+			if (emptySpots.includes(i)) this.inventory.splice(i, 1);
+		}
+	}
+
 	addItem(item) {
 		this.inventory.push(structuredClone(item));
 	}
@@ -163,8 +174,26 @@ export default class Actor extends Entity {
 		const itemId = (typeof itemOrId === 'object') ? itemOrId.itemId : itemOrId;
 		const index = this.inventory.findIndex((it) => it.itemId === itemId);
 		if (index === -1) return false;
+		this.unEquipItem(itemId);
 		this.inventory.splice(index, 1);
 		return true;
+	}
+
+	deconstruct(itemOrId) {
+		const item = this.getItem(itemOrId);
+		if (!item) return 'No such item';
+		if (item.equipped) return 'Cannot deconstruct equipped items.';
+		this.removeItem(itemOrId);
+		// TODO: Add some materials
+		return `Destroyed ${item.name || '??'}`;
+	}
+
+	dropItem(itemOrId) {
+		const item = this.getItem(itemOrId);
+		if (!item) return null;
+		this.unEquipItem(item.itemId);
+		this.removeItem(item);
+		return item;
 	}
 
 	// ----- Damage Calculations
@@ -285,10 +314,10 @@ export default class Actor extends Entity {
 			if (roll < 0.5) this.hp -= 1;
 		}
 		if (this.combatCooldown <= 0) {
-			this.deflection = clamp(this.deflection + 5, 0, this.getMaxDeflection());
-			this.stamina = clamp(this.stamina + 3, 0, this.getMaxStamina());
-			this.mana = clamp(this.mana + 2, 0, this.getMaxMana());
-			this.faith = clamp(this.faith + 4, 0, this.getMaxFaith());
+			this.deflection = clamp(this.deflection + 7, 0, this.getMaxDeflection());
+			this.stamina = clamp(this.stamina + 5, 0, this.getMaxStamina());
+			this.mana = clamp(this.mana + 4, 0, this.getMaxMana());
+			this.faith = clamp(this.faith + 6, 0, this.getMaxFaith());
 		}
 	}
 
@@ -300,5 +329,6 @@ export default class Actor extends Entity {
 		// TODO: things like bleeding, aging, cooldowns, etc.
 		this.naturalHeal();
 		if (this.combatCooldown > 0) this.combatCooldown = clamp(this.combatCooldown - 1, 0, 1);
+		this.cleanInventory();
 	}
 }

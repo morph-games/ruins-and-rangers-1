@@ -2,14 +2,16 @@ import addKeyFreeze from '../addKeyFreeze.js';
 
 export default addKeyFreeze({
 	town: {
+		name: 'Town',
 		grounds: ['grass', 'mud'],
 		props: ['house', 'shop', 'tower', 'cart'],
-		mobChance: 0.2,
-		mobs: ['villager'],
+		mobChance: 0.15,
+		mobs: ['villager', 'villager', 'villager', 'pet'],
 		itemChance: 0.1,
 		itemTags: ['food', 'gear'],
 	},
 	plains: {
+		name: 'Plains',
 		grounds: ['grass', 'grass', 'grass', 'grass', 'river'],
 		props: [],
 		mobChance: 0.05,
@@ -17,18 +19,30 @@ export default addKeyFreeze({
 		itemTags: ['food'],
 	},
 	lightForest: {
+		name: 'Forest',
 		grounds: ['grass'],
 		props: ['deciduousTree', 'anyTree'],
 		mobChance: 0.05,
-		mobs: ['goblin'],
+		mobs: ['goblin', 'bear'],
 		itemTags: ['food'],
 	},
 	darkForest: {
+		name: 'Dark Forest',
 		grounds: ['grass'],
 		props: ['boulders', 'pineTree', 'pineTree', 'anyTree'],
-		mobs: ['goblin'],
+		mobs: ['goblin', 'bear', 'snake'],
+	},
+	swamp: {
+		name: 'Swamp',
+		grounds: ['grass', 'river'],
+		// itemChance: 0.05,
+		// itemTags: ['food'],
+		props: ['deciduousTree', 'deadTree', 'deadTree'],
+		mobChance: 0.2,
+		mobs: ['slime', 'slime', 'snake', 'troll', 'zombie'],
 	},
 	mountains: {
+		name: 'Mountains',
 		grounds: ['grass', 'rock', 'rock'],
 		propChance: 0.3,
 		props: ['boulders'],
@@ -38,6 +52,7 @@ export default addKeyFreeze({
 		mobs: ['goblin', 'orc'],
 	},
 	ruins: {
+		name: 'Ruins',
 		grounds: ['mud', 'rock'],
 		props: [],
 		itemChance: 0.2,
@@ -46,11 +61,12 @@ export default addKeyFreeze({
 		mobs: ['goblin', 'orc', 'cyclops', 'troll'],
 	},
 	crypt: {
+		name: 'Crypt',
 		grounds: ['mud', 'rock'],
 		itemChance: 0.1,
 		itemTags: ['gear'],
 		propChance: 0.1,
 		props: ['grave', 'deadTree'],
-		mobs: ['skeleton', 'skeletonKnight', 'orc'],
+		mobs: ['skeleton', 'skeletonKnight', 'zombie'],
 	},
 });
