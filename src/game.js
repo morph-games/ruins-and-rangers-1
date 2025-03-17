@@ -1,26 +1,18 @@
 import { createApp } from 'vue/dist/vue.esm-bundler.js';
 import ScrollOSprites from './ScrollOSprites.js';
-// import { PseudoRandomizer } from 'rocket-utility-belt';
-// import Actor from './Actor.js';
 import World from './World.js';
-
-// const r = PseudoRandomizer();
-// console.log(r);
+import colors from './colors.js';
 
 const world = new World();
 const scroll = new ScrollOSprites('./images/scroll-o-sprites.png');
 
 world.addItem(0, { name: 'gem' });
 window.world = world;
-
-// const filler = [
-// 	'HP: 20/20 - Statuses',
-// 	'something else',
-// 	'more status',
-// 	'news',
-// 	'more news',
-// 	'even more news',
-// ];
+window.scroll = scroll;
+window.colors = colors;
+colors.loadPalette('Paper-8');
+const BASE_COLORS = [colors.get(4), colors.get(0)];
+const EQUIP_COLORS = [colors.get(2), colors.get(0)];
 
 // function checkOverlap(elementA, elementB) {
 // 	const rectA = elementA.getBoundingClientRect();
@@ -33,6 +25,7 @@ window.world = world;
 
 const $id = (id) => window.document.getElementById(id);
 
+// TODO: Move this to Vue?
 function connectLine(topElt, bottomElt, lineElt) {
 	if (!topElt || !bottomElt || !lineElt) return;
 	const topRect = topElt.getBoundingClientRect();
@@ -70,10 +63,9 @@ const appOptions = {
 			spacesSize: 12,
 			facing: 1,
 			actionIndex: 0,
-			spaces: [
-				130, 3, 127, 126, 125, 1,
-				9, 126, 125, 125, 60, 80,
-			],
+			spaces: [],
+			spaceImages: [],
+			imageDataUri: new Map(),
 			actionsLeft: [
 				{ verb: 'move', display: 'Move [a]', act: () => this.move(-1) },
 				{ verb: 'attack', display: 'Attack [q]', act: () => this.attack(-1) },
@@ -116,14 +108,19 @@ const appOptions = {
 				...this.extraBubbles,
 			];
 		},
+		// imageSource(spriteName) {
+		// 	const uri = this.imageDataUri.get([spriteName, BASE_COLORS]);
+		// 	this.loadImageData(spriteName, BASE_COLORS);
+		// 	return uri;
+		// },
 	},
 	expose: [], // parent component can call these
 	methods: {
-		focusWorld() {
+		async focusWorld() {
 			const offset = (this.facing > 0) ? 1 : 0;
 			this.worldX = Math.min(world.getPlayerCharacterX() - (this.spacesSize / 2) + offset);
 			// console.log(this.worldX);
-			this.loadSpaces();
+			await this.loadSpaces();
 			this.shuffleBubbles();
 		},
 		move(n = 1) {
@@ -144,28 +141,76 @@ const appOptions = {
 			world.action(verb, dx);
 			this.focusWorld();
 		},
-		loadSpaces() {
+		async loadSpaces() {
 			this.spaces = world.getSpaces(this.worldX, this.spacesSize);
 			this.isPcAlive = world.pc.alive;
 			this.range = Math.abs(world.pc.x);
 			if (this.range > this.highestRange) this.highestRange = this.range;
 			this.regionName = world.getRegion()?.name || '';
+			await this.loadSpaceImages();
 			// console.log([...this.spaces]);
 		},
-		getImageSource(spriteName) {
-			return scroll.getDataUri(spriteName);
+		async loadSpaceImages() {
+			// const names = this.spaces.map((space, spaceIndex) => )
+			// 	.filter((n) => n);
+			const promises = this.spaces.map((space, spaceIndex) => {
+				const [spriteName, colorKey] = this.getSpaceSpriteArray(spaceIndex);
+				// const lightColor = [160, 255, 220];
+				const lightColor = colors.get(colorKey);
+				const darkColor = colors.get(space.ground.bgColorKey);
+				const p = scroll.loadColoredSprite(spriteName, [lightColor, darkColor]);
+				return p;
+			});
+			const settledPromises = await Promise.allSettled(promises);
+			this.spaceImages = settledPromises.map((p) => p?.value?.getImageDataUri());
 		},
-		getImageSourceForSpace(spaceIndex) {
+		getSpaceSpriteArray(spaceIndex) {
 			const space = this.spaces[spaceIndex];
+			if (!space || !space.ground) return ['', 2];
 			const { ground, prop, items, mob } = space;
 			let spriteName = (ground) ? ground.spriteName : 'skull';
-			if (prop) spriteName = prop.spriteName;
-			if (items && items.length) spriteName = items[items.length - 1].spriteName;
-			if (mob) spriteName = mob.spriteName;
-			return this.getImageSource(spriteName);
+			let colorKey = ground.colorKey || 'ground';
+			if (prop) {
+				spriteName = prop.spriteName;
+				colorKey = prop.colorKey || 'prop';
+			}
+			if (items && items.length) {
+				spriteName = items[items.length - 1].spriteName;
+				colorKey = 'item';
+			}
+			if (mob) {
+				spriteName = mob.spriteName;
+				colorKey = mob.colorKey || (mob.aggro ? 'monster' : 'npc');
+			}
+			return [spriteName, colorKey];
+		},
+		async loadImageData(spriteName, imgColors) {
+			const dataUri = await scroll.loadColorSpriteDataUri(spriteName, imgColors);
+			const imageKey = [spriteName, imgColors.flat(Infinity).join(',')].join('_');
+
+			this.imageDataUri.set(imageKey, dataUri);
+		},
+		getImageSource(spriteName, imgColors = BASE_COLORS) {
+			const imageKey = [spriteName, imgColors.flat(Infinity).join(',')].join('_');
+			// Get the uri - but the first time this is done it will be incorrect since the image
+			// itsn't properly loaded since this method is synchronous
+			const uri = this.imageDataUri.get(imageKey);
+			// So  we load the image asynchronously so its ready for next time
+			this.loadImageData(spriteName, imgColors);
+			console.log(imageKey, uri, '\n', this.imageDataUri);
+			return uri;
+		},
+		getInventoryItemImageSource(item) {
+			const itemColors = (item?.equipped) ? EQUIP_COLORS : BASE_COLORS;
+			return this.getImageSource(item?.spriteName, itemColors);
+		},
+		getImageSourceForSpace(spaceIndex) {
+			return this.spaceImages[spaceIndex];
+			// return this.getImageSource(this.getSpaceSpriteArray(spaceIndex));
 		},
 		getImageClass(spaceIndex) {
 			const space = this.spaces[spaceIndex];
+			if (!space) return {};
 			// const { ground, prop, items, mob } = space;
 			const { mob } = space;
 			if (mob && mob.actorId === 'pc') {
@@ -190,7 +235,7 @@ const appOptions = {
 		},
 		getSpaceDescription(spaceIndex) {
 			const space = this.spaces[spaceIndex];
-			if (typeof space !== 'object') return '';
+			if (typeof space !== 'object' || !space) return '';
 			const { mob, prop, ground, items } = space;
 			const things = [];
 			const mobName = mob ? mob.name || mob.mobKey : '';
@@ -221,8 +266,9 @@ const appOptions = {
 		},
 		getSpaceInfoLines(spaceIndex) {
 			const space = this.spaces[spaceIndex];
-			const { mob, logs } = space;
-			let lines = [
+			if (!space) return [];
+			const { mob } = space;
+			const lines = [
 				// `x: ${this.worldX + spaceIndex}`,
 				this.getSpaceDescription(spaceIndex),
 			];
@@ -235,12 +281,15 @@ const appOptions = {
 				if (mob.getMaxMana()) lines.push(`Mna ${this.getTextBar(mob.mana, mob.getMaxMana())}`);
 				if (mob.getMaxFaith()) lines.push(`Fth ${this.getTextBar(mob.faith, mob.getMaxFaith())}`);
 			}
-			if (logs) lines = lines.concat(logs);
+			// if (logs) lines = lines.concat(logs);
 			return lines;
 		},
 		makeSpaceBubble(spaceIndex) {
+			const space = this.spaces[spaceIndex] || {};
+			const { logs = [] } = space;
 			return {
 				lines: this.getSpaceInfoLines(spaceIndex),
+				logs,
 				left: 0,
 				top: 0,
 				spaceIndex,
@@ -347,7 +396,7 @@ const appOptions = {
 		<div class="top-bar" :class="showTitle ? 'title' : ''">
 			<div>
 				Ruins &amp; Rangers
-				<span class="version">v1.1.0</span>
+				<span class="version">v1.2.0</span>
 			</div>
 			<div class="sub-title" v-if="showTitle">
 				A One-Dimensional Traditional Roguelike
@@ -373,6 +422,7 @@ const appOptions = {
 					:style="getBubbleStyle(bubbleIndex)"
 					draggable="true">
 					<div v-for="text in bubble.lines" class="bubble-line">{{text}}</div>
+					<div v-for="text in bubble.logs" class="bubble-line bubble-log">{{text}}</div>
 					<div :id="['bubble-connector-line', bubbleIndex].join('-')"
 						class="connector-line"
 						style="position: absolute"
@@ -440,7 +490,7 @@ const appOptions = {
 					<li v-for="item in inventory"
 						:class="getInventoryItemClasses(item)"
 						@click="clickInventoryItem(item)">
-						<img :src="getImageSource(item?.spriteName)" class="inventory-item-image" />
+						<img :src="getInventoryItemImageSource(item)" class="inventory-item-image" />
 						<div class="inventory-tooltip">
 							{{item?.adjective}} {{item?.name || '??'}}
 						</div>

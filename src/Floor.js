@@ -99,14 +99,19 @@ export default class Floor {
 		if (!region) region = this.getRegion(x); // eslint-disable-line no-param-reassign
 		const groundSeed = this.floorSeed + (x * 2);
 		const groundKey = this.randPick(groundSeed, region.grounds);
+		const { sprites, propRequirements = [] } = allGrounds[groundKey];
 		// console.log(region, groundKey, allGrounds[groundKey]);
-		const sprite = this.randPick((groundSeed + 1), allGrounds[groundKey].sprites);
-		const [spriteName] = sprite;
+		const sprite = this.randPick((groundSeed + 1), sprites);
+		const [spriteName, colorKey, bgColorKey] = sprite;
 		return {
 			x,
+			spriteColors: [],
 			spriteName,
 			groundKey,
 			regionKey: region.regionKey,
+			colorKey,
+			bgColorKey: bgColorKey || region.bgColorKey || 0,
+			propRequirements,
 		};
 	}
 
@@ -114,9 +119,16 @@ export default class Floor {
 		if (!region) region = this.getRegion(x); // eslint-disable-line no-param-reassign
 		const { props = [], propChance = DEFAULT_PROP_CHANCE } = region;
 		if (!props.length) return null;
+		// Random chance of having a prop here
 		const propSeed = this.floorSeed + 100 + x;
 		const r = PseudoRandomizer.getPseudoRand(propSeed);
 		if (r > propChance) return null;
+		// Check to ma
+		const ground = this.getGround(x, region);
+		// TODO: If we have prop tags, then make sure the prop has the tags in the propRequirements
+		// list, otherwise don't spawn. For now, if there are any requirements, then don't spawn.
+		if (ground.propRequirements.length) return null;
+		// Randomly pick out a prop
 		const propKey = this.randPick((propSeed + 1), props);
 		const p = allProps[propKey];
 		if (!p) {
@@ -130,6 +142,7 @@ export default class Floor {
 			propId,
 			x,
 			name,
+			spriteColors: [],
 			spriteName,
 			propKey,
 			regionKey: region.regionKey,
@@ -200,6 +213,7 @@ export default class Floor {
 		const item = {
 			itemId,
 			itemKey,
+			spriteColors: [],
 			spriteName,
 			x,
 			name,
@@ -337,16 +351,19 @@ export default class Floor {
 			return;
 		}
 		const defender = mobs[mobs.length - 1];
-		const attackDamage = attacker.calcMeleeAttackDamage();
+		const [attackDamage = {}, strengthenAmounts = {}] = attacker.calcMeleeAttackDamage();
+		const strengthsArray = Object.values(strengthenAmounts);
+		const isWeak = Math.max(...strengthsArray) <= 0;
 		const [
 			total, , deflecting,
 		] = defender.applyDamage(attackDamage);
 		attacker.putInCombat();
 		defender.putInCombat();
-		let msg = (total) ? `${attacker.name} hits ${defender.name} for ${total} damage.`
-			: `${attacker.name} misses ${defender.name}.`;
-		if (deflecting) msg += ' (deflected)';
-		this.addLog(msg, x);
+		const outcome = (total ? `for ${total} damage` : '') + (deflecting ? ' (deflected)' : '');
+		// eslint-disable-next-line no-nested-ternary
+		const msgVerb = (total) ? (isWeak ? 'weakly hits' : 'hits') : 'misses';
+		const msg = [attacker.name, msgVerb, defender.name, outcome].join(' ');
+		this.addLog(`${msg}.`, x);
 	}
 
 	doNextAction(mob) {

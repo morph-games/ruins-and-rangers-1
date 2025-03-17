@@ -1,5 +1,7 @@
 import GameImage from './GameImage.js';
 
+const DEFAULT_COLORS = [[255, 255, 255], [0, 0, 0]];
+const SCROLL_COLORS = [[238, 238, 204], [17, 17, 51]];
 const BASE_X = 32;
 const row1 = 96;
 
@@ -146,7 +148,7 @@ export default class ScrollOSprites {
 		this.parse();
 	}
 
-	getSubImageDataUri(x, y, w = 16, h = 16, canvas = undefined, ctx = undefined) {
+	getSubImage(x, y, w = 16, h = 16, canvas = undefined, ctx = undefined) {
 		if (!canvas || !ctx) {
 			const duo = GameImage.getCanvasContext(w, h);
 			canvas = duo[0]; // eslint-disable-line prefer-destructuring, no-param-reassign
@@ -167,7 +169,7 @@ export default class ScrollOSprites {
 				const { y, names } = row;
 				let x = BASE_X;
 				names.forEach((name) => {
-					const gameImage = this.getSubImageDataUri(x, y, 16, 16, canvas, ctx);
+					const gameImage = this.getSubImage(x, y, 16, 16, canvas, ctx);
 					[
 						`sprite-${index}`,
 						`${groupName}-${groupIndex}`,
@@ -184,12 +186,52 @@ export default class ScrollOSprites {
 		});
 	}
 
-	get(id) {
-		return this.sprites[id];
+	static makeColorId(id, colors = DEFAULT_COLORS) {
+		const [light = [255, 255, 255], dark = [0, 0, 0]] = colors;
+		return `${id}_${light.join(',')}_${dark.join(',')}`;
 	}
 
-	getDataUri(id) {
-		const gi = this.get(id);
+	async loadColoredSprite(id, colors = DEFAULT_COLORS) {
+		const sprite = this.makeColoredSprite(id, colors);
+		await sprite.load();
+		return sprite;
+	}
+
+	async loadColorSpriteDataUri(id, colors = DEFAULT_COLORS) {
+		const sprite = await this.loadColoredSprite(id, colors);
+		if (!sprite) return '';
+		return sprite.getImageDataUri();
+	}
+
+	makeColoredSprite(id, colors = DEFAULT_COLORS) {
+		const [light = [255, 255, 255], dark = [0, 0, 0]] = colors;
+		const sprite = this.get(id);
+		if (!sprite) throw new Error(`Unknown sprite ${id}`);
+		const newSprite = sprite.cloneSync();
+		// newSprite.replaceColor([17, 17, 51], [50, 50, 50]);
+		// newSprite.replaceColor([238, 238, 204], light);
+		newSprite.replaceColors(SCROLL_COLORS, [light, dark]);
+		const fullId = ScrollOSprites.makeColorId(id, colors);
+		this.sprites[fullId] = newSprite;
+		return newSprite;
+	}
+
+	// This doesn't work right because there is no waiting
+	makeColoredSpriteDataUri(id, colors = DEFAULT_COLORS) {
+		const sprite = this.makeColoredSprite(id, colors);
+		return sprite.getImageDataUri();
+	}
+
+	get(id, colors) {
+		if (!colors) return this.sprites[id];
+		const fullId = ScrollOSprites.makeColorId(id, colors);
+		const sprite = this.sprites[fullId];
+		if (sprite) return sprite;
+		return this.makeColoredSprite(id, colors);
+	}
+
+	getDataUri(id, colors) {
+		const gi = this.get(id, colors);
 		if (!gi) return '';
 		return gi.getImageDataUri();
 	}

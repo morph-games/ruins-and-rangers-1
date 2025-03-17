@@ -22,11 +22,39 @@ body {
 	font-family: 'White Rabbit', monospace;
 	padding: 0;
 	margin: 0;
-	background: #242828;
-	background: linear-gradient(#242828 0%, #141818 50%, #242828 100%);
-	color: #f8eebf;
+	--darkest-color: #000;
+	--darker-color: #222;
+	--dark-accent-color: #555;
+	--light-accent-color: #777;
+	--lighter-color: #ccc;
+	--lightest-color: #eee;
+	background: var(--darkest-color);
+	/* background: linear-gradient(var(--darker-color) 0%, var(--darkest-color) 50%, var(--darker-color) 100%); */
+	/* background: linear-gradient(var(--darker-color) 0%, var(--darkest-color) 100%); */
+	background:
+		linear-gradient(#00000003 0%, #ffffff03 50%, #00000003 100%),
+		linear-gradient(var(--darkest-color) 0%, var(--darker-color) 50%, var(--darkest-color) 100%);
+	background-size: 10vmin calc(1vh + 1.5vmin), 100% 100%;
+
+	color: var(--lighter-color);
 	--map-width: calc(76vmin + 20vw);
 	--map-square: calc(var(--map-width) / 12);
+}
+body.enbydiade6 {
+	--darkest-color: #231c24;
+	--darker-color: #332945;
+	--dark-accent-color: #5b3f69;
+	--light-accent-color: #8f596c;
+	--lighter-color: #c2a47e;
+	--lightest-color: #cce3e3;
+}
+body.paper-8 {
+	--darkest-color: #090c20;
+	--darker-color: #1c4b44;
+	--dark-accent-color: #a8605d;
+	--light-accent-color: #60ae7b;
+	--lighter-color: #b6cf8e;
+	--lightest-color: #f6e79c;
 }
 img {
 	image-rendering: pixelated;
@@ -51,7 +79,7 @@ img {
 	padding: 1em;
 	font-size: 0.75rem;
 	justify-content: space-between;
-	color: #fff7;
+	color: var(--light-accent-color);
 }
 .top-bar.title {
 	flex-direction: column;
@@ -59,7 +87,7 @@ img {
 	align-items: center;
 	gap: 10vh;
 	height: 100%;
-	color: #fff;
+	color: var(--lightest-color);
 	font-size: 1.6rem;
 }
 .scores {
@@ -135,6 +163,9 @@ img {
 .bubble-line {
 	margin: 0.1em 0;
 }
+.bubble-log {
+	color: var(--lightest-color);
+}
 .connector-line {
 	border-top: solid 1px #fff3;
 }
@@ -209,11 +240,15 @@ button {
 	font-family: 'White Rabbit', monospace;
 	font-size: inherit;
 	padding: 0.5em 1em;
-	background: #0004;
-	color: #edefcc;
+	background: var(--darkest-color);
+	color: var(--lightest-color);
 	border: solid 1px #fff4;
 	cursor: pointer;
 	transition: all 0.05s ease-in-out;
+	user-select: none;
+}
+button:active {
+	transform: scale(0.98);
 }
 button:hover {
 	border-color: #fff6;
@@ -228,6 +263,9 @@ button:hover {
 	margin-left: -7vw;
 	padding: 0;
 	border: #000;
+	overflow: hidden;
+	border-radius: 1vmin;
+	border: solid 1px var(--lighter-color);
 }
 .action-selection > img {
 	display: block;
@@ -252,7 +290,7 @@ button:hover {
 .inventory {
 	--inv-width: calc(30vw + 20em);
 	--inv-height: calc(10vh + 20em);
-	--inv-bg: #000d;
+	--inv-bg: var(--darkest-color);
 	/* position: absolute; */
 	/* left: 50%; */
 	bottom: 1em;
@@ -275,7 +313,6 @@ button:hover {
 	height: auto;
 	max-height: 90vh;
 	transform: scale(1);
-	/* margin-left: calc(var(--inv-width) / -2); */
 }
 
 .inventory-actions {
@@ -290,21 +327,21 @@ button:hover {
 	padding: 0.5em 1em;
 	cursor: pointer;
 	border-radius: 0.2em;
-	color: #fff;
+	color: var(--lightest-color);
 }
 .inv-action-long {
 	font-size: 80%;
 }
 .inventory-actions label:hover {
-	background: #fff3;
+	background: var(--dark-accent-color);
 }
 .inventory-actions input {
 	display: none;
 }
 input:checked ~ label,
 input:checked ~ label:hover {
-	color: #000;
-	background: #f8eebf;
+	color: var(--darkest-color);
+	background: var(--lighter-color);
 }
 
 .inventory-items {
@@ -327,19 +364,19 @@ input:checked ~ label:hover {
 	height: var(--map-square);
 }
 .inventory-item {
-	border: solid 2px #fff3;
+	border: solid 2px var(--darker-color);
 	cursor: pointer;
 }
 .inventory-item:hover {
-	border-color: #fff8;
+	border-color: var(--light-accent-color);
 }
 .inventory-item-equipped,
 .inventory-item-equipped:hover {
-	border-color: #433ff3;
+	border-color: var(--dark-accent-color);
 }
 
 .inventory-info-equipped {
-	color: #433ff3;
+	color: var(--dark-accent-color);
 }
 .inventory-info-tags {
 	margin-top: 0.7em;
@@ -356,8 +393,8 @@ input:checked ~ label:hover {
 	transform: scale(0);
 	transition: all 0.1s linear;
 	padding: 0.2em;
-	background: #fff6;
-	color: #000;
+	background: var(--light-accent-color);
+	color: var(--darkest-color);
 }
 .inventory-item:hover .inventory-tooltip {
 	/* display: block; */

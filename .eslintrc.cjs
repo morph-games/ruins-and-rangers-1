@@ -4,6 +4,7 @@ module.exports = {
 	],
 	rules: {
 		// your custom rules here
+		'max-lines': ['error', { max: 600, skipComments: true }],
 	},
 	parserOptions: {
 		ecmaVersion: 2021,

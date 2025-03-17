@@ -9,6 +9,7 @@ export default addKeyFreeze({
 		mobs: ['villager', 'villager', 'villager', 'pet'],
 		itemChance: 0.1,
 		itemTags: ['food', 'gear'],
+		bgColorKey: 'naturalBg',
 	},
 	plains: {
 		name: 'Plains',
@@ -17,6 +18,7 @@ export default addKeyFreeze({
 		mobChance: 0.05,
 		mobs: ['villager'],
 		itemTags: ['food'],
+		bgColorKey: 'naturalBg',
 	},
 	lightForest: {
 		name: 'Forest',
@@ -25,12 +27,14 @@ export default addKeyFreeze({
 		mobChance: 0.05,
 		mobs: ['goblin', 'bear'],
 		itemTags: ['food'],
+		bgColorKey: 'naturalBg',
 	},
 	darkForest: {
 		name: 'Dark Forest',
 		grounds: ['grass'],
 		props: ['boulders', 'pineTree', 'pineTree', 'anyTree'],
 		mobs: ['goblin', 'bear', 'snake'],
+		bgColorKey: 'darkBg',
 	},
 	swamp: {
 		name: 'Swamp',
@@ -40,6 +44,7 @@ export default addKeyFreeze({
 		props: ['deciduousTree', 'deadTree', 'deadTree'],
 		mobChance: 0.2,
 		mobs: ['slime', 'slime', 'snake', 'troll', 'zombie'],
+		bgColorKey: 'darkBg',
 	},
 	mountains: {
 		name: 'Mountains',
@@ -50,6 +55,7 @@ export default addKeyFreeze({
 		// items: ['pickaxe', 'torch', 'lantern', 'rope', 'chest', 'unpolished-stone', 'bone',
 		// 'fossil-ammonite'],
 		mobs: ['goblin', 'orc'],
+		bgColorKey: 'naturalBg',
 	},
 	ruins: {
 		name: 'Ruins',
@@ -59,6 +65,7 @@ export default addKeyFreeze({
 		itemTags: ['gear', 'weapon', 'armor'],
 		mobChance: 0.2,
 		mobs: ['goblin', 'orc', 'cyclops', 'troll'],
+		bgColorKey: 'darkBg',
 	},
 	crypt: {
 		name: 'Crypt',
@@ -68,5 +75,6 @@ export default addKeyFreeze({
 		propChance: 0.1,
 		props: ['grave', 'deadTree'],
 		mobs: ['skeleton', 'skeletonKnight', 'zombie'],
+		bgColorKey: 'darkBg',
 	},
 });

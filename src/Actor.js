@@ -33,6 +33,7 @@ export default class Actor extends Entity {
 		this.naturalDamage = naturalDamage;
 
 		const [spriteName] = sprite;
+		this.spriteColors = []; // TODO
 		this.spriteName = spriteName;
 
 		this.lastHits = [];
@@ -231,6 +232,7 @@ export default class Actor extends Entity {
 
 	/**
 	 * Applies strength to damages
+	 * Returns an array of new damage (strengthened or weakend), and the strengthen amounts
 	 */
 	applyStrengthToDamages(damageObj = {}) {
 		const newDamage = {};
@@ -241,9 +243,13 @@ export default class Actor extends Entity {
 			strengthenAmounts[dmgKey] = dmgStr;
 		});
 		// console.log(newDamage, strengthenAmounts);
-		return newDamage;
+		return [newDamage, strengthenAmounts];
 	}
 
+	/**
+	 * Calculate the melee damage for this user, strengthening it, and rolling damage
+	 * @returns Array of rolled damage (strengthened or weakend), and the strengthen amounts
+	 */
 	calcMeleeAttackDamage() {
 		let baseDamage = this.naturalDamage;
 		if (this.equipSlots.hand) {
@@ -251,7 +257,8 @@ export default class Actor extends Entity {
 			if (!weapon || !weapon.attack || !weapon.attack.damage) return {};
 			baseDamage = weapon.attack.damage;
 		}
-		return rollDamages(this.applyStrengthToDamages(baseDamage));
+		const [newDamage, strengthenAmounts] = this.applyStrengthToDamages(baseDamage);
+		return [rollDamages(newDamage), strengthenAmounts];
 	}
 
 	applyDamage(incomingDamage = {}) {

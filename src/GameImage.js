@@ -22,12 +22,25 @@ export default class GameImage extends Image {
 		await loadPromise;
 		this.isLoaded = true;
 		this.setup();
+		return this;
 	}
 
 	setup() {
-		this.data = this.getImageData();
+		this.data = this.getImageData(); // ctx param?
 		// this.flippedHorizontal = this.getFlippedImage(-1, 1);
 		// this.flippedVertical = this.getFlippedImage(1, -1);
+	}
+
+	async clone() {
+		const sprite = new GameImage(this.src);
+		await sprite.load();
+		return sprite;
+	}
+
+	cloneSync() {
+		const sprite = new GameImage(this.src);
+		sprite.load();
+		return sprite;
 	}
 
 	static getCanvasContext(width, height, image) {
@@ -62,15 +75,36 @@ export default class GameImage extends Image {
 		this.src = canvas.toDataURL('image/png');
 	}
 
-	replaceColor(oldColor, newColor) {
+	replaceColors(oldColors = [], newColors = []) {
 		// Based on http://jsfiddle.net/m1erickson/4apAS/
 		const [canvas, ctx] = this.getCanvasContext({ draw: true });
-		const oldRed = oldColor.red;
-		const oldGreen = oldColor.green;
-		const oldBlue = oldColor.blue;
-		const newRed = newColor.red;
-		const newGreen = newColor.green;
-		const newBlue = newColor.blue;
+		const imageData = this.getImageData(ctx);
+		for (let i = 0; i < imageData.data.length; i += 4) {
+			oldColors.forEach((oldColor, colorIndex) => {
+				const [oldRed, oldGreen, oldBlue] = oldColor;
+				const [newRed, newGreen, newBlue] = newColors[colorIndex];
+				if (
+					imageData.data[i] === oldRed
+					&& imageData.data[i + 1] === oldGreen
+					&& imageData.data[i + 2] === oldBlue
+				) {
+					imageData.data[i] = newRed;
+					imageData.data[i + 1] = newGreen;
+					imageData.data[i + 2] = newBlue;
+					// count += 1;
+				}
+			});
+		}
+		// TODO: can set by data directly?
+		ctx.putImageData(imageData, 0, 0);
+		this.setSourceByCanvas(canvas);
+	}
+
+	replaceColor(oldColor = [], newColor = []) {
+		// Based on http://jsfiddle.net/m1erickson/4apAS/
+		const [canvas, ctx] = this.getCanvasContext({ draw: true });
+		const [oldRed, oldGreen, oldBlue] = oldColor;
+		const [newRed, newGreen, newBlue] = newColor;
 		let count = 0;
 		const imageData = this.getImageData(ctx);
 		for (let i = 0; i < imageData.data.length; i += 4) {

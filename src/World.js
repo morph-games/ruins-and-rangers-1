@@ -9,6 +9,7 @@ const starterRegion = {
 	itemTags: ['food', 'gear', 'weapon'],
 	itemChance: 0.2,
 	// itemTags: ['gear'],
+	bgColorKey: 'naturalBg',
 };
 
 const PC_ID = 'pc';
@@ -25,6 +26,7 @@ export default class World {
 		this.activeFloor = this.floors.get(this.overworldId);
 		this.pc = new Actor(0, PC_ID, 'hero', ['archer-m', 1]);
 		this.pc.intelligence = 0;
+		this.pc.colorKey = 'pc';
 		this.activeFloor.addMob(this.pc);
 		this.highestRange = 0;
 	}

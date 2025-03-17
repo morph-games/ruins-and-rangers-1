@@ -3,26 +3,27 @@ import addKeyFreeze from '../addKeyFreeze.js';
 export default addKeyFreeze({
 	grass: {
 		sprites: [
-			['grass-a', 1],
-			['grass-b', 1],
-			['grass-c', 1],
+			['grass-a', 'greenGround'],
+			['grass-b', 'greenGround'],
+			['grass-c', 'greenGround'],
 		],
 	},
 	mud: {
 		sprites: [
-			['grass-b', 1],
+			['grass-b', 'brownGround'],
 		],
 	},
 	rock: {
 		sprites: [
-			['rock-a', 1],
-			['rock-b', 1],
-			['rock-c', 1],
+			['rock-a', 'rockGround'],
+			['rock-b', 'rockGround'],
+			['rock-c', 'rockGround'],
 		],
 	},
 	river: {
 		sprites: [
-			['water', 1],
+			['water', 'waterGround', 'waterBg'],
 		],
+		propRequirements: ['water'],
 	},
 });
